@@ -29,6 +29,129 @@ class MPS(nn.Module):
 			label_site = input_dim // 2
 		assert label_site >= 0 and label_site <= input_dim
 
+		# Using bias matrices in adaptive_mode is too complicated, so I'm
+		# disabling it here
+		if adaptive_mode:
+			use_bias = False
+		# Our MPS is made of two InputRegions separated by an OutputSite.
+		module_list = []
+		init_args = {'bond_str': 'slri',
+					 'shape': [label_site, bond_dim, bond_dim, feature_dim],
+					 'init_method': ('min_random_eye' if adaptive_mode else
+					 'random_zero', init_std, output_dim)}
+
+		# The first input region
+		if label_site > 0:
+			tensor = init_tensor(**init_args)
+
+			module_list.append(InputRegion(tensor, use_bias=use_bias,
+										   fixed_bias=fixed_bias))
+
+		# The output site
+		tensor = init_tensor(shape=[output_dim, bond_dim, bond_dim],
+			bond_str='olr', init_method=('min_random_eye' if adaptive_mode else
+										 'random_eye', init_std, output_dim))
+		module_list.append(OutputSite(tensor))
+
+		# The other input region
+		if label_site < input_dim:
+			init_args['shape'] = [input_dim-label_site, bond_dim, bond_dim,
+								  feature_dim]
+			#print('label_site ', label_site)
+			#print('init_args[shape] ', init_args['shape'])
+			tensor = init_tensor(**init_args)
+			module_list.append(InputRegion(tensor, use_bias=use_bias,
+										   fixed_bias=fixed_bias))
+
+		# Initialize linear_region according to our adaptive_mode specification
+		if adaptive_mode:
+			self.linear_region = MergedLinearRegion(module_list=module_list,
+								 periodic_bc=periodic_bc,
+								 parallel_eval=parallel_eval, cutoff=cutoff,
+								 merge_threshold=merge_threshold)
+
+			# Initialize the list of bond dimensions, which starts out constant
+			self.bond_list = bond_dim * torch.ones(input_dim + 2,
+												   dtype=torch.long)
+			if not periodic_bc:
+				self.bond_list[0], self.bond_list[-1] = 1, 1
+
+			# Initialize the list of singular values, which start out at -1
+			self.sv_list = -1. * torch.ones([input_dim + 2, bond_dim])
+
+		else:
+			self.linear_region = LinearRegion(module_list=module_list,
+								 periodic_bc=periodic_bc,
+								 parallel_eval=parallel_eval)
+		assert len(self.linear_region) == input_dim
+
+		if path:
+			assert isinstance(path, (list, torch.Tensor))
+			assert len(path) == input_dim
+
+		# Set the rest of our MPS attributes
+		self.input_dim = input_dim
+		self.output_dim = output_dim
+		self.bond_dim = bond_dim
+		self.feature_dim = feature_dim
+		self.periodic_bc = periodic_bc
+		self.adaptive_mode = adaptive_mode
+		self.label_site = label_site
+		self.path = path
+		self.use_bias = use_bias
+		self.fixed_bias = fixed_bias
+		self.cutoff = cutoff
+		self.merge_threshold = merge_threshold
+		self.feature_map = None
+		self.linear_region = self.linear_region.to(device)
+		module_list = [m.to(device) for m in module_list]
+
+	def forward(self, input_data):
+		"""
+		Embed our data and pass it to an MPS with a single output site
+
+		Args:
+			input_data (Tensor): Input with shape [batch_size, input_dim] or
+								 [batch_size, input_dim, feature_dim]. In the
+								 former case, the data points are turned into
+								 2D vectors using a default linear feature map.
+		"""
+		input_data = input_data.permute(0,2,1)
+
+		x1 = torch.cos(input_data * PI/2)
+		x2 = torch.sin(input_data* PI/2)
+		x = torch.cat((x1,x2),dim=2)
+		output = self.linear_region(x)
+
+		return output.squeeze()
+
+	def core_len(self):
+		"""
+		Returns the number of cores, which is at least the required input size
+		"""
+		return self.linear_region.core_len()
+
+	def __len__(self):
+		"""
+		Returns the number of input sites, which equals the input size
+		"""
+		return self.input_dim
+
+class ReLUMPS(nn.Module):
+	"""
+	Matrix product state which converts input into a single output vector
+	"""
+	def __init__(self, input_dim, output_dim, bond_dim, feature_dim=2, nCh=3,
+				 adaptive_mode=False, periodic_bc=False, parallel_eval=False,
+				 label_site=None, path=None, init_std=1e-9, use_bias=True,
+				 fixed_bias=True, cutoff=1e-10, merge_threshold=2000):
+		super().__init__()
+
+		org_input_dim = input_dim
+		if label_site is None:
+			label_site = input_dim // 2
+		assert label_site >= 0 and label_site <= input_dim
+
 		# Using bias matrices in adaptive_mode is too complicated, so I'm 
 		# disabling it here
 		if adaptive_mode:
@@ -118,8 +241,8 @@ class MPS(nn.Module):
 		"""
 		input_data = input_data.permute(0,2,1)
 
-		x1 = torch.cos(input_data * PI/2)
-		x2 = torch.sin(input_data* PI/2)		
+		x1 = torch.nn.functional.relu(input_data)
+		x2 = torch.sigmoid(input_data)
 		x = torch.cat((x1,x2),dim=2)
 		output = self.linear_region(x)
 

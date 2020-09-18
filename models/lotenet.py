@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-from models.mps import MPS
+from models.mps import MPS, ReLUMPS
 import pdb
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -45,7 +45,7 @@ class MERAnet_clean(nn.Module):
 			# First level isometries
 
 			### First level MERA blocks
-			self.disentangler_list.append(nn.ModuleList([MPS(input_dim=4,
+			self.disentangler_list.append(nn.ModuleList([ReLUMPS(input_dim=4,
 											  output_dim=4,
 											  nCh=nCh, bond_dim=4,
 											  feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -54,7 +54,7 @@ class MERAnet_clean(nn.Module):
 
 			iDim = iDim + 1
 
-			self.isometry_list.append(nn.ModuleList([MPS(input_dim=4,
+			self.isometry_list.append(nn.ModuleList([ReLUMPS(input_dim=4,
 													output_dim=1,
 													nCh=nCh, bond_dim=bond_dim,
 													feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -64,7 +64,7 @@ class MERAnet_clean(nn.Module):
 
 
 		### Final MPS block
-		self.mpsFinal = MPS(input_dim=49,
+		self.mpsFinal = ReLUMPS(input_dim=49,
 							output_dim=output_dim, nCh=1,
 							bond_dim=bond_dim, feature_dim=feature_dim,
 							adaptive_mode=adaptive_mode, periodic_bc=periodic_bc,
@@ -148,7 +148,7 @@ class MERAnet(nn.Module):
 		# First level isometries
 
 		### First level MERA blocks
-		self.Disentangler_1 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_1 = nn.ModuleList([ReLUMPS(input_dim=4,
 										  output_dim=4,
 										  nCh=nCh, bond_dim=4,
 										  feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -157,7 +157,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_1 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_1 = nn.ModuleList([ReLUMPS(input_dim=4,
 												output_dim=1,
 												nCh=nCh, bond_dim=bond_dim,
 												feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -168,7 +168,7 @@ class MERAnet(nn.Module):
 		iDim = (iDim-2) / 2
 
 		### Second level MERA blocks
-		self.Disentangler_2 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_2 = nn.ModuleList([ReLUMPS(input_dim=4,
 												 output_dim=4,
 												 nCh=nCh, bond_dim=4,
 												 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -177,7 +177,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_2 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_2 = nn.ModuleList([ReLUMPS(input_dim=4,
 											 output_dim=1,
 											 nCh=nCh, bond_dim=bond_dim,
 											 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -187,7 +187,7 @@ class MERAnet(nn.Module):
 		iDim = (iDim - 2) / 2
 
 		### 3rd level MERA blocks
-		self.Disentangler_3 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_3 = nn.ModuleList([ReLUMPS(input_dim=4,
 												 output_dim=4,
 												 nCh=nCh, bond_dim=4,
 												 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -196,7 +196,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_3 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_3 = nn.ModuleList([ReLUMPS(input_dim=4,
 											 output_dim=1,
 											 nCh=nCh, bond_dim=bond_dim,
 											 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -205,7 +205,7 @@ class MERAnet(nn.Module):
 		iDim = (iDim - 2) / 2
 
 		### 4th level MERA blocks
-		self.Disentangler_4 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_4 = nn.ModuleList([ReLUMPS(input_dim=4,
 												 output_dim=4,
 												 nCh=nCh, bond_dim=4,
 												 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -214,7 +214,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_4 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_4 = nn.ModuleList([ReLUMPS(input_dim=4,
 											 output_dim=1,
 											 nCh=nCh, bond_dim=bond_dim,
 											 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -223,7 +223,7 @@ class MERAnet(nn.Module):
 		iDim = (iDim - 2) / 2
 
 		### 5th level MERA blocks
-		self.Disentangler_5 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_5 = nn.ModuleList([ReLUMPS(input_dim=4,
 												 output_dim=4,
 												 nCh=nCh, bond_dim=4,
 												 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -232,7 +232,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_5 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_5 = nn.ModuleList([ReLUMPS(input_dim=4,
 											 output_dim=1,
 											 nCh=nCh, bond_dim=bond_dim,
 											 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -240,7 +240,7 @@ class MERAnet(nn.Module):
 										 for i in range(torch.prod(iDim))])
 		iDim = (iDim - 2) / 2
 		### 6th level MERA blocks
-		self.Disentangler_6 = nn.ModuleList([MPS(input_dim=4,
+		self.Disentangler_6 = nn.ModuleList([ReLUMPS(input_dim=4,
 												 output_dim=4,
 												 nCh=nCh, bond_dim=4,
 												 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -249,7 +249,7 @@ class MERAnet(nn.Module):
 
 		iDim = iDim + 1
 
-		self.Isometry_6 = nn.ModuleList([MPS(input_dim=4,
+		self.Isometry_6 = nn.ModuleList([ReLUMPS(input_dim=4,
 											 output_dim=1,
 											 nCh=nCh, bond_dim=bond_dim,
 											 feature_dim=feature_dim, parallel_eval=parallel_eval,
@@ -260,7 +260,7 @@ class MERAnet(nn.Module):
 		iDim = (iDim - 2) / 2
 
 		### Final MPS block
-		self.mpsFinal = MPS(input_dim=4,
+		self.mpsFinal = ReLUMPS(input_dim=4,
 							output_dim=output_dim, nCh=1,
 							bond_dim=bond_dim, feature_dim=feature_dim,
 							adaptive_mode=adaptive_mode, periodic_bc=periodic_bc,

@@ -7,7 +7,6 @@ import torchvision.transforms as transforms
 from torch.utils.data import TensorDataset, DataLoader, Dataset
 import pdb
 
-
 class LIDC(Dataset):
 	def __init__(self, rater=4, split='Train', data_dir = './', transform=None):
 		super().__init__()
@@ -31,7 +30,6 @@ class LIDC(Dataset):
 		if self.transform is not None:
 			image = self.transform(image)
 		return image, label
-
 
 
 

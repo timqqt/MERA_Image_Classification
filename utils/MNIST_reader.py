@@ -73,11 +73,11 @@ def get_train_valid_loader(data_dir,
 
     valid_dataset = datasets.MNIST(root=data_dir, train=True,
                                    download=True, transform=valid_transform)
-    train_dataset.targets[train_dataset.targets < 5] = 0
-    train_dataset.targets[train_dataset.targets >= 5] = 1
+    train_dataset.targets[train_dataset.targets < 1] = 0
+    train_dataset.targets[train_dataset.targets >= 1] = 1
 
-    valid_dataset.targets[valid_dataset.targets < 5] = 0
-    valid_dataset.targets[valid_dataset.targets >= 5] = 1
+    valid_dataset.targets[valid_dataset.targets < 1] = 0
+    valid_dataset.targets[valid_dataset.targets >= 1] = 1
 
     num_train = len(train_dataset)
     indices = list(range(num_train))
@@ -139,8 +139,8 @@ def get_test_loader(data_dir,
                              download=True,
                              transform=transform)
 
-    dataset.targets[dataset.targets < 5] = 0
-    dataset.targets[dataset.targets >= 5] = 1
+    dataset.targets[dataset.targets < 1] = 0
+    dataset.targets[dataset.targets >= 1] = 1
 
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=batch_size,
