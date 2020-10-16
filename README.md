@@ -3,6 +3,7 @@
 #### Finished Work:
 1. Implemented 2D MERA model using PyTorch and TensorFlow. TensorFlow version is more time-efficient.
 2. Tested our 2D MERA model on MNIST, NeedleMNIST(64x64, 128x128) and LIDC dataset. 
+
 | Attempt | #1  | #2  |
 | ------- | --- | --- |
 | Seconds | 301 | 283 |
