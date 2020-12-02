@@ -1,5 +1,10 @@
 # MERA_Image_Classification
 ## Code Contributor: Fanjie Kong
+### TBD:
+- The script for training MNIST
+- The script for training NeedleMNIST
+- The script for training LIDC
+- TensorFlow version implementation. I use the tensorflow version for experiments in paper.
 #### Finished Work:
 1. Implemented 2D MERA model using PyTorch and TensorFlow. TensorFlow version is more time-efficient.
 2. Tested our 2D MERA model on MNIST, NeedleMNIST(64x64, 128x128) and LIDC dataset. 
