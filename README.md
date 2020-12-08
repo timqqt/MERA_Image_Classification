@@ -29,3 +29,6 @@
 ##### TensorFlow code:
 * TensorFlow 2.1.0 and TensorNetwork
 * Experiments are performed on Jupyter Notebook
+
+##### Thanks to the following repositories: 
+- https://github.com/raghavian/loTeNet_pytorch
