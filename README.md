@@ -21,7 +21,7 @@
 -
 
 #### Description:
-##### PyTorch code:
+##### PyTorch codes:
 * Basic Pytorch dependency
 * Tested on Pytorch 1.3, Python 3.6 
 * Unzip the data and point the path to --data_path
