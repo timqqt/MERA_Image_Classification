@@ -12,9 +12,6 @@
 
 3. Summarized our work into a paper submitted to QTNML 2020
 
-#### Future Work:
--
-
 #### Description:
 ##### PyTorch codes:
 * Basic Pytorch dependency
@@ -23,7 +20,7 @@
 * How to run tests: python train.py --data_path data_location
 ##### TensorFlow code:
 * TensorFlow 2.1.0 and TensorNetwork
-* Experiments are performed on Jupyter Notebook
+* Experiments are performed on Jupyter Notebook MERA_MNIST.ipynb
 
 ##### Thanks to the following repositories: 
 - https://github.com/raghavian/loTeNet_pytorch
